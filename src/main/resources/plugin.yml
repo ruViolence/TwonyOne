@@ -1,0 +1,5 @@
+name: TwonyOne
+main: ru.violence.twonyone.TwonyOnePlugin
+version: ${project.version}
+depend: [ CoreAPI, xHolo ]
+softdepend: [ BetterChairs ]

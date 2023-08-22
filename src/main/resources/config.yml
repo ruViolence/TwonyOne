@@ -1,0 +1,7 @@
+bet:
+  min: 25
+  max: 150
+  default: 50
+  fee: 10
+
+games: { }
