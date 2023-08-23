@@ -4,7 +4,7 @@ import lombok.experimental.UtilityClass;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
-import ru.violence.coreapi.common.util.Check;
+import ru.violence.coreapi.common.api.util.Check;
 
 @UtilityClass
 public class LocationUtil {

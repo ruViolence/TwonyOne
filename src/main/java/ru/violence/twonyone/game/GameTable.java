@@ -11,13 +11,13 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ru.violence.coreapi.bukkit.api.BukkitHelper;
-import ru.violence.coreapi.common.message.MessageKey;
-import ru.violence.coreapi.common.user.NotEnoughCoinsException;
-import ru.violence.coreapi.common.user.User;
+import ru.violence.coreapi.bukkit.api.util.BukkitHelper;
+import ru.violence.coreapi.common.api.message.MessageKey;
+import ru.violence.coreapi.common.api.user.NotEnoughCoinsException;
+import ru.violence.coreapi.common.api.user.User;
+import ru.violence.coreapi.common.api.util.Check;
 import ru.violence.coreapi.common.user.transaction.TransactionCause;
 import ru.violence.coreapi.common.user.transaction.TransactionSource;
-import ru.violence.coreapi.common.util.Check;
 import ru.violence.twonyone.LangKeys;
 import ru.violence.twonyone.TwonyOnePlugin;
 import ru.violence.twonyone.config.Config;
@@ -118,8 +118,8 @@ public class GameTable {
         getHostChair().getPlayer().sendTitle("", "");
 
         try {
-            User userHost = BukkitHelper.getUser(getHostChair().getPlayer());
-            User userGuest = BukkitHelper.getUser(getHostChair().getOpposite().getPlayer());
+            User userHost = BukkitHelper.getUser(getHostChair().getPlayer()).get();
+            User userGuest = BukkitHelper.getUser(getHostChair().getOpposite().getPlayer()).get();
 
             if (userHost.getDonateCoins() < bet.getAmount()) {
                 throw new NotEnoughCoinsException(userHost, bet.getAmount());
@@ -582,20 +582,20 @@ public class GameTable {
 
     private void rewardWinner(@NotNull Player player) {
         Check.notNull(bet);
-        BukkitHelper.getUser(player).depositDonateCoins(Utils.calculateAmountWithFee(bet.getAmount() * 2, Config.BET_FEE), TransactionCause.PLUGIN, TransactionSource.PLUGIN, "TwonyOne winning");
+        BukkitHelper.getUser(player).get().depositDonateCoins(Utils.calculateAmountWithFee(bet.getAmount() * 2, Config.BET_FEE), TransactionCause.PLUGIN, TransactionSource.PLUGIN, "TwonyOne winning");
     }
 
     private void refundTie() {
         Check.notNull(bet);
         for (Player player : getPlayers()) {
-            BukkitHelper.getUser(player).depositDonateCoins(bet.getAmount(), TransactionCause.PLUGIN, TransactionSource.PLUGIN, "TwonyOne tie");
+            BukkitHelper.getUser(player).get().depositDonateCoins(bet.getAmount(), TransactionCause.PLUGIN, TransactionSource.PLUGIN, "TwonyOne tie");
         }
     }
 
     private void refundPluginDisable() {
         Check.notNull(bet);
         for (Player player : getPlayers()) {
-            BukkitHelper.getUser(player).depositDonateCoins(bet.getAmount(), TransactionCause.PLUGIN, TransactionSource.PLUGIN, "TwonyOne plugin disable");
+            BukkitHelper.getUser(player).get().depositDonateCoins(bet.getAmount(), TransactionCause.PLUGIN, TransactionSource.PLUGIN, "TwonyOne plugin disable");
         }
     }
 }

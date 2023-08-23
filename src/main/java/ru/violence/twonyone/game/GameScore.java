@@ -2,7 +2,7 @@ package ru.violence.twonyone.game;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ru.violence.coreapi.common.util.Check;
+import ru.violence.coreapi.common.api.util.Check;
 
 import java.util.ArrayList;
 import java.util.Collection;

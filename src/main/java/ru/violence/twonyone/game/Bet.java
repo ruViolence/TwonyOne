@@ -2,7 +2,7 @@ package ru.violence.twonyone.game;
 
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import ru.violence.coreapi.common.util.MathUtil;
+import ru.violence.coreapi.common.api.util.MathUtil;
 import ru.violence.twonyone.config.Config;
 
 public class Bet {

@@ -1,33 +1,37 @@
 package ru.violence.twonyone.menu;
 
+import lombok.experimental.UtilityClass;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 import ru.violence.coreapi.bukkit.api.menu.Menu;
 import ru.violence.coreapi.bukkit.api.menu.MenuHelper;
-import ru.violence.coreapi.bukkit.api.menu.button.Buttons;
-import ru.violence.coreapi.bukkit.api.util.MessageUtil;
-import ru.violence.coreapi.bukkit.util.ItemBuilder;
+import ru.violence.coreapi.bukkit.api.menu.button.Button;
+import ru.violence.coreapi.bukkit.api.menu.listener.ClickListener;
+import ru.violence.coreapi.bukkit.api.util.ItemBuilder;
+import ru.violence.coreapi.bukkit.api.util.RendererHelper;
 import ru.violence.twonyone.LangKeys;
 import ru.violence.twonyone.TwonyOnePlugin;
 import ru.violence.twonyone.game.GameTable;
 
-public class QuitConfirmMenu extends Menu {
-    private final GameTable table;
+@UtilityClass
+public class QuitConfirmMenu {
+    public void createAndOpen(Player player, GameTable table) {
+        Menu.newBuilder(TwonyOnePlugin.getInstance())
+                .title(RendererHelper.legacy(player, LangKeys.MENU_QUIT_TITLE))
+                .size(27)
+                .clickListener(ClickListener.cancel())
+                .openListener(openEvent -> {
+                    Menu menu = openEvent.getMenu();
 
-    public QuitConfirmMenu(@NotNull Player player, GameTable table) {
-        super(player, MessageUtil.renderLegacy(player, LangKeys.MENU_QUIT_TITLE), 27);
-        this.table = table;
-    }
+                    menu.setButton(11, Button.simple(new ItemBuilder(Material.WOOL, 1, (short) 14).display(RendererHelper.legacy(player, LangKeys.MENU_QUIT_CONFIRM)).build()).action(clickEvent -> {
+                        player.closeInventory();
+                        TwonyOnePlugin.getInstance().getGameManager().removeFromGame(player);
+                    }));
+                    menu.setButton(15, Button.simple(new ItemBuilder(Material.WOOL, 1, (short) 8).display(RendererHelper.legacy(player, LangKeys.MENU_QUIT_CANCEL)).build()).action(clickEvent -> player.closeInventory()));
 
-    @Override
-    public void onInitialize() {
-        setButton(11, Buttons.makeSimple(new ItemBuilder(Material.WOOL, 1, (short) 14).setDescription(MessageUtil.renderLegacy(player, LangKeys.MENU_QUIT_CONFIRM)), (player, menu, button, clickType) -> {
-            player.closeInventory();
-            TwonyOnePlugin.getInstance().getGameManager().removeFromGame(player);
-        }));
-        setButton(15, Buttons.makeSimple(new ItemBuilder(Material.WOOL, 1, (short) 8).setDescription(MessageUtil.renderLegacy(player, LangKeys.MENU_QUIT_CANCEL)), (player, menu, button, clickType) -> player.closeInventory()));
-
-        MenuHelper.fillBorder(this);
+                    MenuHelper.fillBorder(menu);
+                })
+                .build()
+                .open(player);
     }
 }

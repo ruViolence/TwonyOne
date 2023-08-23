@@ -2,20 +2,20 @@ package ru.violence.twonyone.menu;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import lombok.experimental.UtilityClass;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import ru.violence.coreapi.bukkit.api.BukkitHelper;
 import ru.violence.coreapi.bukkit.api.menu.Menu;
 import ru.violence.coreapi.bukkit.api.menu.MenuHelper;
-import ru.violence.coreapi.bukkit.api.menu.button.Buttons;
-import ru.violence.coreapi.bukkit.api.util.MessageUtil;
-import ru.violence.coreapi.bukkit.util.ItemBuilder;
-import ru.violence.coreapi.common.user.NotEnoughCoinsException;
-import ru.violence.coreapi.common.user.User;
-import ru.violence.coreapi.common.util.Check;
-import ru.violence.coreapi.common.util.CommonUtil;
-import ru.violence.coreapi.common.util.MathUtil;
+import ru.violence.coreapi.bukkit.api.menu.button.Button;
+import ru.violence.coreapi.bukkit.api.menu.listener.ClickListener;
+import ru.violence.coreapi.bukkit.api.util.BukkitHelper;
+import ru.violence.coreapi.bukkit.api.util.ItemBuilder;
+import ru.violence.coreapi.bukkit.api.util.RendererHelper;
+import ru.violence.coreapi.common.api.user.NotEnoughCoinsException;
+import ru.violence.coreapi.common.api.util.MathUtil;
+import ru.violence.coreapi.common.api.util.NullUtil;
 import ru.violence.twonyone.LangKeys;
 import ru.violence.twonyone.TwonyOnePlugin;
 import ru.violence.twonyone.config.Config;
@@ -25,91 +25,93 @@ import ru.violence.twonyone.game.GameChair;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-public class BetAdjustMenu extends Menu {
-    private static final Cache<UUID, Integer> MULTIPLIER_CACHE = CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.MINUTES).build();
-    private final GameChair chair;
-    private int amount;
+@UtilityClass
+public class BetAdjustMenu {
+    private final Cache<UUID, Integer> MULTIPLIER_CACHE = CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.MINUTES).build();
 
-    public BetAdjustMenu(@NotNull Player player, @NotNull GameChair chair) {
-        super(player, MessageUtil.renderLegacy(player, LangKeys.MENU_BET_ADJUST_TITLE), 45);
-        this.chair = chair;
-        this.amount = CommonUtil.orElse(MULTIPLIER_CACHE.getIfPresent(player.getUniqueId()), Config.BET_DEFAULT);
+    public void createAndOpen(@NotNull Player player, @NotNull GameChair chair) {
+        createAndOpen(player, chair, NullUtil.orElse(MULTIPLIER_CACHE.getIfPresent(player.getUniqueId()), Config.BET_DEFAULT));
     }
 
-    @Override
-    public void onInitialize() {
-        setButton(8, Buttons.makeDummy(new ItemBuilder(Material.EMPTY_MAP).setDescription(MessageUtil.renderLegacy(player, LangKeys.MENU_GAME_HELP))));
+    public void createAndOpen(@NotNull Player player, @NotNull GameChair chair, int amount) {
+        Menu.newBuilder(TwonyOnePlugin.getInstance())
+                .title(RendererHelper.legacy(player, LangKeys.MENU_BET_ADJUST_TITLE))
+                .size(45)
+                .clickListener(ClickListener.cancel())
+                .openListener(openEvent -> {
+                    Menu menu = openEvent.getMenu();
 
-        setReduceButton(10, 25);
-        setReduceButton(11, 15);
-        setReduceButton(12, 5);
+                    menu.setButton(8, Button.simple(new ItemBuilder(Material.EMPTY_MAP).display(RendererHelper.legacy(player, LangKeys.MENU_GAME_HELP)).build()));
 
-        // Info button
-        setButton(13, Buttons.makeDummy(new ItemBuilder(Material.GOLD_INGOT).setDescription(MessageUtil.renderLegacy(player, LangKeys.MENU_BET_ADJUST_INFO.setArgs(amount)))));
+                    setReduceButton(menu, player, chair, amount, 10, 25);
+                    setReduceButton(menu, player, chair, amount, 11, 15);
+                    setReduceButton(menu, player, chair, amount, 12, 5);
 
-        setIncreaseButton(14, 5);
-        setIncreaseButton(15, 15);
-        setIncreaseButton(16, 25);
+                    // Info button
+                    menu.setButton(13, Button.simple(new ItemBuilder(Material.GOLD_INGOT).display(RendererHelper.legacy(player, LangKeys.MENU_BET_ADJUST_INFO.setArgs(amount))).build()));
 
-        // Confirm button
-        setButton(30, Buttons.makeSimple(new ItemBuilder(Material.WOOL, 1, (short) 4).setDescription(MessageUtil.renderLegacy(player, LangKeys.MENU_BET_ADJUST_CONFIRM.setArgs(amount))), (player, menu, button, clickType) -> {
-            player.closeInventory();
+                    setIncreaseButton(menu, player, chair, amount, 14, 5);
+                    setIncreaseButton(menu, player, chair, amount, 15, 15);
+                    setIncreaseButton(menu, player, chair, amount, 16, 25);
 
-            if (chair.getTable().getBet() != null) {
-                BukkitHelper.getUser(player).sendMessage(LangKeys.TABLE_GOT_OCCUPIED);
-                return;
-            }
+                    // Confirm button
+                    menu.setButton(30, Button.simple(new ItemBuilder(Material.WOOL, 1, (short) 4).display(RendererHelper.legacy(player, LangKeys.MENU_BET_ADJUST_CONFIRM.setArgs(amount))).build()).action(clickEvent -> {
+                        player.closeInventory();
 
-            try {
-                if (getUser().getDonateCoins() < amount) {
-                    throw new NotEnoughCoinsException(getUser(), amount);
-                }
+                        if (chair.getTable().getBet() != null) {
+                            BukkitHelper.getUser(player).get().sendMessage(LangKeys.TABLE_GOT_OCCUPIED);
+                            return;
+                        }
 
-                MULTIPLIER_CACHE.put(player.getUniqueId(), amount);
-                TwonyOnePlugin.getInstance().getGameManager().addToGame(player, chair, new Bet(chair, amount));
-            } catch (NotEnoughCoinsException e) {
-                e.tellAboutIt();
-            }
-        }));
+                        try {
+                            if (BukkitHelper.getUser(player).get().getDonateCoins() < amount) {
+                                throw new NotEnoughCoinsException(BukkitHelper.getUser(player).get(), amount);
+                            }
 
-        // Cancel button
-        setButton(32, Buttons.makeSimple(new ItemBuilder(Material.WOOL, 1, (short) 8).setDescription(MessageUtil.renderLegacy(player, LangKeys.MENU_BET_ADJUST_CANCEL)), (player, menu, button, clickType) -> player.closeInventory()));
+                            MULTIPLIER_CACHE.put(player.getUniqueId(), amount);
+                            TwonyOnePlugin.getInstance().getGameManager().addToGame(player, chair, new Bet(chair, amount));
+                        } catch (NotEnoughCoinsException e) {
+                            e.tellAboutIt();
+                        }
+                    }));
 
-        MenuHelper.fillBorder(this);
+                    // Cancel button
+                    menu.setButton(32, Button.simple(new ItemBuilder(Material.WOOL, 1, (short) 8).display(RendererHelper.legacy(player, LangKeys.MENU_BET_ADJUST_CANCEL)).build()).action(clickEvent -> player.closeInventory()));
+
+                    MenuHelper.fillBorder(menu);
+                })
+                .build()
+                .open(player);
     }
 
-    private void setReduceButton(int slot, int amount) {
-        if (!canChangeBet(-amount)) {
-            setButton(slot, null);
+    private void setReduceButton(@NotNull Menu menu, @NotNull Player player, @NotNull GameChair chair, int currentAmount, int slot, int amount) {
+        if (!canChangeBet(currentAmount, -amount)) {
+            menu.setButton(slot, (Button) null);
             return;
         }
-        setButton(slot, Buttons.makeSimple(new ItemBuilder(Material.WOOL, amount, (short) 14).setDescription(MessageUtil.renderLegacy(player, LangKeys.MENU_BET_ADJUST_REDUCE.setArgs(this.amount, amount))), (p, m, b, c) -> {
-            this.amount = clampBet(this.amount + (-amount));
-            onInitialize();
+        menu.setButton(slot, Button.simple(new ItemBuilder(Material.WOOL, amount, (short) 14).display(RendererHelper.legacy(player, LangKeys.MENU_BET_ADJUST_REDUCE.setArgs(currentAmount, amount))).build()).action(clickEvent -> {
+            int newAmount = clampBet(currentAmount + (-amount));
+            createAndOpen(player, chair, newAmount);
         }));
     }
 
-    private void setIncreaseButton(int slot, int amount) {
-        if (!canChangeBet(amount)) {
-            setButton(slot, null);
+    private void setIncreaseButton(@NotNull Menu menu, @NotNull Player player, @NotNull GameChair chair, int currentAmount, int slot, int amount) {
+        if (!canChangeBet(currentAmount, amount)) {
+            menu.setButton(slot, (Button) null);
             return;
         }
-        setButton(slot, Buttons.makeSimple(new ItemBuilder(Material.WOOL, amount, (short) 5).setDescription(MessageUtil.renderLegacy(player, LangKeys.MENU_BET_ADJUST_INCREASE.setArgs(this.amount, amount))), (p, m, b, c) -> {
-            this.amount = clampBet(this.amount + amount);
-            onInitialize();
+        menu.setButton(slot, Button.simple(new ItemBuilder(Material.WOOL, amount, (short) 5).display(RendererHelper.legacy(player, LangKeys.MENU_BET_ADJUST_INCREASE.setArgs(currentAmount, amount))).build()).action(clickEvent -> {
+            int newAmount = clampBet(currentAmount + amount);
+            createAndOpen(player, chair, newAmount);
         }));
     }
 
-    private boolean canChangeBet(int amount) {
-        int calculated = this.amount + amount;
+    private boolean canChangeBet(int currentAmount, int amount) {
+        int calculated = currentAmount + amount;
         return calculated == clampBet(calculated);
     }
 
-    private @NotNull User getUser() {
-        return Check.notNull(BukkitHelper.getUser(this.player), () -> "User of player " + this.player.getName() + " was not found");
-    }
-
-    private static int clampBet(int amount) {
+    private int clampBet(int amount) {
         return MathUtil.clamp(amount, Config.BET_MIN, Config.BET_MAX);
     }
 }

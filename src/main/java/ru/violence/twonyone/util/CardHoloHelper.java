@@ -5,7 +5,7 @@ import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
-import ru.violence.coreapi.common.util.MathUtil;
+import ru.violence.coreapi.common.api.util.MathUtil;
 import ru.violence.twonyone.TwonyOnePlugin;
 import ru.violence.twonyone.game.Card;
 import ru.violence.twonyone.game.ChairNumber;

@@ -59,7 +59,7 @@ public class GameItemUseListener implements Listener {
 
     private void handleLeave(Player player, GameTable table) {
         if (table.getState() == State.PLAYING) {
-            new QuitConfirmMenu(player, table).open();
+            QuitConfirmMenu.createAndOpen(player, table);
         } else {
             plugin.getGameManager().removeFromGame(player);
         }

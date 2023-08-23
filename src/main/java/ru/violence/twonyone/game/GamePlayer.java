@@ -5,9 +5,9 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import ru.violence.coreapi.bukkit.api.util.MessageUtil;
-import ru.violence.coreapi.bukkit.util.ItemBuilder;
-import ru.violence.coreapi.common.util.Check;
+import ru.violence.coreapi.bukkit.api.util.ItemBuilder;
+import ru.violence.coreapi.bukkit.api.util.RendererHelper;
+import ru.violence.coreapi.common.api.util.Check;
 import ru.violence.twonyone.LangKeys;
 
 public class GamePlayer {
@@ -21,12 +21,12 @@ public class GamePlayer {
     }
 
     public void giveLeaveItem() {
-        player.getInventory().setItem(8, new ItemBuilder(Material.DARK_OAK_DOOR_ITEM).setDescription(MessageUtil.renderLegacy(player, LangKeys.GAME_ITEM_LEAVE)).build());
+        player.getInventory().setItem(8, new ItemBuilder(Material.DARK_OAK_DOOR_ITEM).display(RendererHelper.legacy(player, LangKeys.GAME_ITEM_LEAVE)).build());
     }
 
     public void giveTurnItems() {
-        player.getInventory().setItem(0, new ItemBuilder(Material.WOOL, 1, (short) 1).setDescription(MessageUtil.renderLegacy(player, LangKeys.GAME_ITEM_DRAW)).build());
-        player.getInventory().setItem(1, new ItemBuilder(Material.WOOL, 1, (short) 8).setDescription(MessageUtil.renderLegacy(player, LangKeys.GAME_ITEM_KEEP)).build());
+        player.getInventory().setItem(0, new ItemBuilder(Material.WOOL, 1, (short) 1).display(RendererHelper.legacy(player, LangKeys.GAME_ITEM_DRAW)).build());
+        player.getInventory().setItem(1, new ItemBuilder(Material.WOOL, 1, (short) 8).display(RendererHelper.legacy(player, LangKeys.GAME_ITEM_KEEP)).build());
     }
 
     public void hideTurnItems() {
