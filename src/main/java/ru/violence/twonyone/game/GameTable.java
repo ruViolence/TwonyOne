@@ -241,8 +241,8 @@ public class GameTable {
     }
 
     private void playWinSound(@NotNull GameChair winner) {
-        winner.getPlayer().playSound(getCenter(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1f, 0.8f);
-        broadcastSoundNearby(Sound.UI_TOAST_CHALLENGE_COMPLETE, 1f, 0.8f, false);
+        winner.getPlayer().playSound(getCenter(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 0.8f);
+        broadcastSoundNearby(Sound.ENTITY_PLAYER_LEVELUP, 1f, 0.8f, false);
     }
 
     private void playLoseSound(@NotNull GameChair loser) {
