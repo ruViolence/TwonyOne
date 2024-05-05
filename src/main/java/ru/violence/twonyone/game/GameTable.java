@@ -67,7 +67,7 @@ public class GameTable {
         this.waitingHolo3 = new Holo(scoreHoloLoc.clone().add(0, Holo.LINE_OFFSET * 2, 0));
         this.scoreHoloLoc = scoreHoloLoc;
         this.broadcastNearbyRadius = broadcastNearbyRadius;
-        spawnWaitingHolo();
+        spawnWaitingHolo(false);
     }
 
     void addPlayer(@NotNull GamePlayer gamePlayer, @NotNull GameChair chair, @Nullable Bet bet) {
@@ -84,6 +84,7 @@ public class GameTable {
         if (!getOppositeChair(chair).isOccupied()) {
             state = State.WAITING;
             LangHelper.sendTitle(gamePlayer.getPlayer(), LangKeys.TITLE_AWAITING_OPPONENT);
+            spawnWaitingHolo(true);
             return;
         }
 
@@ -301,13 +302,19 @@ public class GameTable {
         }
         turnExpireTask.cancel();
         lastWasKeep = false;
-        if (!onDisable) spawnWaitingHolo();
+        if (!onDisable) spawnWaitingHolo(false);
     }
 
-    private void spawnWaitingHolo() {
-        waitingHolo1.setText(LangKeys.HOLO_WAITING_1);
-        waitingHolo2.setText(LangKeys.HOLO_WAITING_2);
-        waitingHolo3.setText(LangKeys.HOLO_WAITING_3);
+    private void spawnWaitingHolo(boolean waitingForOther) {
+        if (waitingForOther) {
+            waitingHolo1.setText(LangKeys.HOLO_WAITING_FOR_OTHER_1.setArgs(bet.getAmount()));
+            waitingHolo2.setText(LangKeys.HOLO_WAITING_FOR_OTHER_2.setArgs(bet.getAmount()));
+            waitingHolo3.setText(LangKeys.HOLO_WAITING_FOR_OTHER_3.setArgs(bet.getAmount()));
+        } else {
+            waitingHolo1.setText(LangKeys.HOLO_WAITING_1);
+            waitingHolo2.setText(LangKeys.HOLO_WAITING_2);
+            waitingHolo3.setText(LangKeys.HOLO_WAITING_3);
+        }
     }
 
     private void destroyWaitingHolo() {

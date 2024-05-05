@@ -17,6 +17,9 @@ public class LangKeys {
     public final MessageKey HOLO_WAITING_1 = of("holo.waiting-1");
     public final MessageKey HOLO_WAITING_2 = of("holo.waiting-2");
     public final MessageKey HOLO_WAITING_3 = of("holo.waiting-3");
+    public final MessageKey HOLO_WAITING_FOR_OTHER_1 = of("holo.waiting-for-other-1");
+    public final MessageKey HOLO_WAITING_FOR_OTHER_2 = of("holo.waiting-for-other-2");
+    public final MessageKey HOLO_WAITING_FOR_OTHER_3 = of("holo.waiting-for-other-3");
     public final MessageKey HOLO_SCORE_YOU = of("holo.score-you");
     public final MessageKey HOLO_SCORE_OPPONENT = of("holo.score-opponent");
     public final MessageKey HOLO_SCORE_OPPONENT_REVEAL = of("holo.score-opponent-reveal");
