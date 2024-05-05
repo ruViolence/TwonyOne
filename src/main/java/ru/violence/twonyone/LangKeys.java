@@ -23,6 +23,7 @@ public class LangKeys {
     public final MessageKey HOLO_SCORE_YOU = of("holo.score-you");
     public final MessageKey HOLO_SCORE_OPPONENT = of("holo.score-opponent");
     public final MessageKey HOLO_SCORE_OPPONENT_REVEAL = of("holo.score-opponent-reveal");
+    public final MessageKey HOLO_SCORE_PUBLIC_BET = of("holo.score-public-bet");
     public final MessageKey HOLO_SCORE_PUBLIC_1 = of("holo.score-public-1");
     public final MessageKey HOLO_SCORE_PUBLIC_2 = of("holo.score-public-2");
     public final MessageKey HOLO_SCORE_PUBLIC_1_REVEAL = of("holo.score-public-1-reveal");

@@ -49,6 +49,7 @@ public class GameTable {
     private Bet bet;
     private GameScore score;
     private GameChair currentTurnChair;
+    private Holo scoreHoloPublicBet;
     private Holo scoreHoloPublic1;
     private Holo scoreHoloPublic2;
     private final TaskHolder turnExpireTask = new TaskHolder();
@@ -292,6 +293,10 @@ public class GameTable {
         bet = null;
         score = null;
         currentTurnChair = null;
+        if (scoreHoloPublicBet != null) {
+            scoreHoloPublicBet.destroy();
+            scoreHoloPublicBet = null;
+        }
         if (scoreHoloPublic1 != null) {
             scoreHoloPublic1.destroy();
             scoreHoloPublic1 = null;
@@ -386,6 +391,10 @@ public class GameTable {
         }
 
         { // Public
+            if (scoreHoloPublicBet == null) {
+                scoreHoloPublicBet = new Holo(getScoreHoloLoc().add(0, -Holo.LINE_OFFSET, 0));
+                scoreHoloPublicBet.setText(LangKeys.HOLO_SCORE_PUBLIC_BET.setArgs(bet.getAmount()));
+            }
             if (scoreHoloPublic1 == null) {
                 scoreHoloPublic1 = new Holo(getScoreHoloLoc());
                 scoreHoloPublic1.setCanViewFilter(player -> !hasPlayer(player));
