@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.violence.coreapi.common.api.message.MessageKey;
 import ru.violence.coreapi.common.api.util.Check;
+import ru.violence.twonyone.TwonyOnePlugin;
 import ru.violence.xholo.api.ArmorStandDataBuilder;
 import ru.violence.xholo.api.CustomName;
 import ru.violence.xholo.api.VirtualArmorStand;
@@ -85,7 +86,7 @@ public class Holo {
     }
 
     private void createHologram() {
-        this.armorStand = XHolo.builder()
+        this.armorStand = XHolo.builder(TwonyOnePlugin.getInstance())
                 .data(ArmorStandDataBuilder.builder()
                         .marker(true)
                         .visible(false)
