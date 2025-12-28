@@ -7,6 +7,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import ru.violence.coreapi.bukkit.api.util.BukkitHelper;
+import ru.violence.coreapi.common.api.user.User;
 import ru.violence.twonyone.LangKeys;
 import ru.violence.twonyone.TwonyOnePlugin;
 import ru.violence.twonyone.game.State;
@@ -45,6 +47,14 @@ public class ChairClickListener implements Listener {
 
             // Can't reach
             if (!chair.canSit(player)) return;
+
+            User playerUser = BukkitHelper.getUser(player).orElse(null);
+            if (playerUser == null) return;
+
+            if (!playerUser.has2faActiveBotLink()) {
+                player.sendMessage("§cНеобходимо наличие привязки аккаунта с включенным 2FA!");
+                return;
+            }
 
             if (chair.getTable().isBetSet()) {
                 BetConfirmMenu.createAndOpen(player, chair);
